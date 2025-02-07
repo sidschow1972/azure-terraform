@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    environment {
+        AZURE_SUBSCRIPTION_ID = credentials('AZURE_SUBSCRIPTION_ID')
+        AZURE_CLIENT_ID = credentials('AZURE_CLIENT_ID')
+        AZURE_CLIENT_SECRET = credentials('AZURE_CLIENT_SECRET')
+        AZURE_TENANT_ID = credentials('AZURE_TENANT_ID')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/your-repo.git'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                sh 'terraform plan -var-file="terraform.tfvars"'
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                sh 'terraform apply -auto-approve -var-file="terraform.tfvars"'
+            }
+        }
+
+        stage('Run Python Script') {
+            steps {
+                sh 'python3 script.py'
+            }
+        }
+    }
+}
